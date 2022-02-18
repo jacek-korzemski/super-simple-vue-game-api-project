@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VUE learning</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            font-size: 20px;
+            font-weight: 200;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        h1,
+        h2,
+        h3 {
+            text-align: center;
+        }
+
+        .games,
+        .buttons {
+            list-style-type: none;
+            margin: 0;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-column-gap: 15px;
+            grid-row-gap: 15px;
+        }
+
+        .games li,
+        .buttons li {
+            list-style-type: none;
+            margin: 0;
+            padding: 15px 30px;
+            border: 1px solid black;
+            background: white;
+            color: black;
+        }
+
+        .games li {
+            padding: 0;
+            border: none;
+            background: none;
+            color: none;
+            position: relative;
+        }
+
+        .games li a {
+            display: block;
+            padding: 15px 30px;
+            border: 1px solid black;
+            background: white;
+            color: black;
+            text-decoration: none;
+            height: 100%;
+        }
+
+        .games li a:hover {
+            color: white;
+            background: black;
+        }
+
+        .buttons li {
+            cursor: pointer;
+        }
+
+        .buttons li:hover,
+        .buttons li.active {
+            background: black;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <h1>Free to play games</h1>
+        <h2>Pick genre:</h2>
+        <ul class="buttons">
+            <li v-on:click="loadData('tank')" v-bind:class="[genre == 'tank' ? 'active' : '']">Get tank games</li>
+            <li v-on:click="loadData('mmorpg')" v-bind:class="[genre == 'mmorpg' ? 'active' : '']">Get mmorpg Games</li>
+            <li v-on:click="loadData('shooter')" v-bind:class="[genre == 'shooter' ? 'active' : '']">Get shooter Games
+            </li>
+            <li v-on:click="loadData('strategy')" v-bind:class="[genre == 'strategy' ? 'active' : '']">Get strategy
+                Games</li>
+            <li v-on:click="loadData('moba')" v-bind:class="[genre == 'moba' ? 'active' : '']">Get moba Games</li>
+            <li v-on:click="loadData('racing')" v-bind:class="[genre == 'racing' ? 'active' : '']">Get racing Games</li>
+            <li v-on:click="loadData('sports')" v-bind:class="[genre == 'sports' ? 'active' : '']">Get sports Games</li>
+            <li v-on:click="loadData('sandbox')" v-bind:class="[genre == 'sandbox' ? 'active' : '']">Get sandbox Games
+            </li>
+            <li v-on:click="loadData('open-world')" v-bind:class="[genre == 'open-world' ? 'active' : '']">Get
+                open-world Games</li>
+            <li v-on:click="loadData('survival')" v-bind:class="[genre == 'survival' ? 'active' : '']">Get survival
+                Games</li>
+            <li v-on:click="loadData('pvp')" v-bind:class="[genre == 'pvp' ? 'active' : '']">Get pvp Games</li>
+            <li v-on:click="loadData('pixel')" v-bind:class="[genre == 'pixel' ? 'active' : '']">Get pixel Games</li>
+            <li v-on:click="loadData('voxel')" v-bind:class="[genre == 'voxel' ? 'active' : '']">Get voxel Games</li>
+            <li v-on:click="loadData('zombie')" v-bind:class="[genre == 'zombie' ? 'active' : '']">Get zombie Games</li>
+            <li v-on:click="loadData('turn-based')" v-bind:class="[genre == 'turn-based' ? 'active' : '']">Get
+                turn-based Games</li>
+        </ul>
+        <h2 v-if="this.genre">Free games for: {{genre}}</h2>
+        <ul v-if="this.data" class="games">
+            <li v-for="item in this.data">
+                <a :href="item.game_url" target="_blank" rel="noopener noreferrer nofollow">{{item.title}}</a>
+            </li>
+        </ul>
+    </div>
+
+    <script src="https://unpkg.com/vue@next"></script>
+    <script>
+        const App = {
+            data() {
+                return {
+                    data: undefined,
+                    genre: undefined,
+                }
+            },
+            methods: {
+                loadData(category = 'all') {
+                    console.log('Yes, triggered');
+                    fetch("https://free-to-play-games-database.p.rapidapi.com/api/games?category=" + category, {
+                        "method": "GET",
+                        "headers": {
+                            "x-rapidapi-host": "free-to-play-games-database.p.rapidapi.com",
+                            "x-rapidapi-key": "a3b1bb08femsh47c42071274227cp1d69e0jsn4ad514f0ba17"
+                        }
+                    })
+                        .then(response => {
+                            return response.json();
+                        })
+                        .then((response) => {
+                            this.data = response;
+                            this.genre = category;
+                            console.log(response);
+                        })
+                        .catch(err => {
+                            this.genre = "Error";
+                            console.error(err);
+                        });
+                }
+            }
+        }
+
+        Vue.createApp(App).mount('#app');
+    </script>
+</body>
+
+</html>
