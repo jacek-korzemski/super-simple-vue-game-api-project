@@ -86,30 +86,14 @@
         <h1>Free to play games</h1>
         <h2>Pick genre:</h2>
         <ul class="buttons">
-            <li v-on:click="loadData('tank')" v-bind:class="[genre == 'tank' ? 'active' : '']">Get tank games</li>
-            <li v-on:click="loadData('mmorpg')" v-bind:class="[genre == 'mmorpg' ? 'active' : '']">Get mmorpg Games</li>
-            <li v-on:click="loadData('shooter')" v-bind:class="[genre == 'shooter' ? 'active' : '']">Get shooter Games
+            <li v-for="genre in this.allGenres" v-bind:class="[genre === this.currentGenre ? 'active' : '']"
+                v-on:click="this.loadData(genre)">
+                Get {{genre}} games
             </li>
-            <li v-on:click="loadData('strategy')" v-bind:class="[genre == 'strategy' ? 'active' : '']">Get strategy
-                Games</li>
-            <li v-on:click="loadData('moba')" v-bind:class="[genre == 'moba' ? 'active' : '']">Get moba Games</li>
-            <li v-on:click="loadData('racing')" v-bind:class="[genre == 'racing' ? 'active' : '']">Get racing Games</li>
-            <li v-on:click="loadData('sports')" v-bind:class="[genre == 'sports' ? 'active' : '']">Get sports Games</li>
-            <li v-on:click="loadData('sandbox')" v-bind:class="[genre == 'sandbox' ? 'active' : '']">Get sandbox Games
-            </li>
-            <li v-on:click="loadData('open-world')" v-bind:class="[genre == 'open-world' ? 'active' : '']">Get
-                open-world Games</li>
-            <li v-on:click="loadData('survival')" v-bind:class="[genre == 'survival' ? 'active' : '']">Get survival
-                Games</li>
-            <li v-on:click="loadData('pvp')" v-bind:class="[genre == 'pvp' ? 'active' : '']">Get pvp Games</li>
-            <li v-on:click="loadData('pixel')" v-bind:class="[genre == 'pixel' ? 'active' : '']">Get pixel Games</li>
-            <li v-on:click="loadData('voxel')" v-bind:class="[genre == 'voxel' ? 'active' : '']">Get voxel Games</li>
-            <li v-on:click="loadData('zombie')" v-bind:class="[genre == 'zombie' ? 'active' : '']">Get zombie Games</li>
-            <li v-on:click="loadData('turn-based')" v-bind:class="[genre == 'turn-based' ? 'active' : '']">Get
-                turn-based Games</li>
         </ul>
-        <h2 v-if="this.genre">Free games for: {{genre}}</h2>
-        <ul v-if="this.data" class="games">
+        <h2 v-if="isLoading">Loadign...</h2>
+        <h2 v-if="this.currentGenre && !isLoading">Free games for: {{currentGenre}}</h2>
+        <ul v-if="this.data && !isLoading" class="games">
             <li v-for="item in this.data">
                 <a :href="item.game_url" target="_blank" rel="noopener noreferrer nofollow">{{item.title}}</a>
             </li>
@@ -121,13 +105,31 @@
         const App = {
             data() {
                 return {
+                    isLoading: false,
                     data: undefined,
-                    genre: undefined,
+                    currentGenre: undefined,
+                    allGenres: [
+                        'tank',
+                        'mmorpg',
+                        'shooter',
+                        'strategy',
+                        'moba',
+                        'racing',
+                        'sports',
+                        'sandbox',
+                        'open-world',
+                        'survival',
+                        'pvp',
+                        'pixel',
+                        'voxel',
+                        'zombie',
+                        'turn-based',
+                    ]
                 }
             },
             methods: {
                 loadData(category = 'all') {
-                    console.log('Yes, triggered');
+                    this.isLoading = true;
                     fetch("https://free-to-play-games-database.p.rapidapi.com/api/games?category=" + category, {
                         "method": "GET",
                         "headers": {
@@ -140,11 +142,12 @@
                         })
                         .then((response) => {
                             this.data = response;
-                            this.genre = category;
-                            console.log(response);
+                            this.currentGenre = category;
+                            this.isLoading = false;
                         })
                         .catch(err => {
                             this.genre = "Error";
+                            this.isLoading = false;
                             console.error(err);
                         });
                 }
